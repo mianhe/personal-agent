@@ -14,4 +14,4 @@ setup(
             "personal-agent=cli.cli:main",
         ],
     },
-) 
+)

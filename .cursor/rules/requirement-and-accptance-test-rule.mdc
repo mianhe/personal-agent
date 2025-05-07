@@ -1,0 +1,104 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+需求描述文档和需求的自动验收测试（acceptance test)的规则
+
+本规则的适用范围包括：
+- 需求文档的整理和组织，尤其适用于以业务领域（Domain）→特性（Feature）→功能点（Function Point, FP）→验收标准（Acceptance Criteria, AC）来表述测试
+- 测试用例组织，测试用例和测试代码生成及重构，尤其是从需求文档生成测试要
+
+# 一. 背景
+
+本项目采用验收测试驱动开发（Acceptance Test Driven Development, ATDD）方法。为此，验收测试与需求文档按业务领域放在同一文件夹之下，并建立清晰的对应关系。
+
+req_and_tests/
+├── domain/                  # 业务领域，通常是从用户视角定义的功能领域
+    ├── requirement/         # 该业务领域下的需求文档
+    ├── acceptance/     # 对应该需求的验收测试，目的是覆盖功能的验收标准
+    └── interface/      # 接口测试，目的是验证模块间的接口契约
+
+其中业务领域为可选，对于小型项目可能不划分业务领域。
+
+# 二. 需求文档的结构介绍 
+
+每个需求领域的 requirement 文件夹之下，都会包含一篇 evergreen（持续维护的）主文档 req_and_ac.md，用来表示该业务领域下全量的需求和需求的验收标准（acceptance criteria)。其内部结构如下：
+
+## 第一部分：需求说明
+包含业务背景、目标、上下文等信息
+
+## 第二部分：特性列表
+特性列表中包含该领域所支持的所有特性（Feature）。每个特性包含所支持的功能点（Function Point, FP），以及每个功能点对应的验收标准（Acceptance Criteria, AC）。
+
+其结构可表示为：业务领域 → 特性 → 功能点 → 验收标准
+
+以下是一个示例：
+
+```markdown
+### 特性1：CLI基本功能
+**编码**：cli_basic
+**描述**：提供基本的命令行聊天界面，能提供欢迎词，并解析系统级的命令（如：/help）。
+
+**功能点**：
+1. 启动基础CLI交付
+   - 验收标准：启动后显示欢迎词
+
+2. 解析基础系统命令 
+   - 验收标准：
+     - 在命令行中，按"/"后提示支持的系统命令
+     - 能够响应"/exit"命令并正常退出程序
+     - 能够响应"/help"命令并提供帮助信息
+     - 能够响应"/clear"命令并清屏
+
+### 特性2：LLM对话能力(LLM_chat)
+**描述**：集成大型语言模型，提供智能对话体验。
+
+**功能点**：
+1. 与LLM进行基本对话(ChatWithLLM)
+   - 验收标准：用户能够接收到LLM的回复，回复内容有意义且相关
+```
+
+# 三. 验收测试的结构和规则
+
+功能测试的目标是验证系统实现与需求的吻合度，追求尽可能完整地覆盖需求文档中的需求。功能测试通过就意味着系统符合需求文档中的定义。因此，
+- 在验收测试中应尽量不使用 Mock，除非刻意要隔离掉无法满足的外部依赖，但需要在注释中说明原因
+- 验收测试只应该依赖前端，而不要直接依赖后端，如果不得已依赖后端，也需要说明原因
+
+## 3.1 测试对应关系
+```
+特性（Feature） -> req_and_test/<domain>/acceptance/test_<feature>.py
+功能点（Function Point, FP） -> Test<FunctionPoint> 类
+验收标准（Acceptance Criteria, AC） -> test_<acceptance_criteria> 方法
+```
+
+## 3.2 测试的组织和命名规则
+- **测试模块**：需求中的每个特性对应一个测试模块（即一个测试文件）。文件的位置和命名规则如下：
+  ```
+  req_and_test/<domain>/acceptance/test_<feature>.py
+  例如：test_cli_basic.py
+  其中<feature>指的是 feature 的编码，如：cli_basic
+  ```
+
+- **测试类**：特性的每个功能点，对应测试模块中的一个测试类，其命名规则为：
+  ```
+  Test<FunctionPoint>
+  例如：TestBasicDialogue
+  ```
+  FunctionPoint的命名是基于功能点的英文提炼。
+
+- **测试方法**：有限一个验收标准对应一个测试用例，其命名规则为：
+  ```
+  test_<what>_should_<expected_behavior>
+  例如：test_list_models_command_should_display_available_llm_providers
+  ```
+  如果多个验收标准紧密关联，可以考虑包含在同一个测试用例中。如果可以用数据驱动的测试，尽可能用数据驱动的方法来测试
+
+## 3.3 其他说明
+- 验收测试只应该依赖前端，而不应该对后端直接依赖（如：依赖 CLI 而不应该依赖core）
+- 如有新特性或需求变更，需同步更新 main_requirement.md 和相关测试文件。
+- 如遇遗留代码或特殊业务场景，可适当调整命名或结构，但需在文档中注明原因。
+
+
+
+

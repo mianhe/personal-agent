@@ -1,0 +1,118 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+接口设计和接口测试（interface test)适用的规则
+
+
+# interface-and-interface-test-rule
+
+本规则适用于：
+- **接口设计**：如何在 core 层设计对外接口（如 chat_service.py），包括命名、分层、依赖、职责等。
+- **接口测试**：如何组织和编写接口级测试代码，确保接口的逻辑正确性和高覆盖率。
+
+---
+
+## 一. 背景
+
+本项目采用分层架构，强调"表现层只依赖核心业务的对外接口"。接口设计和接口测试是保证核心业务可维护性、可扩展性和高质量的关键环节。
+
+接口测试与功能/验收测试不同，**关注接口本身的逻辑和健壮性**，追求高代码覆盖率和快速反馈。
+
+---
+
+## 二. 接口设计规则（Interface Design Rule）
+
+> **本节用于约定 core 层接口（如 chat_service.py）的设计原则、命名规范、依赖约束等。**
+>
+> 目前预留，后续补充。
+
+### 2.1 设计原则
+
+- （待补充）
+
+### 2.2 命名规范
+
+- （待补充）
+
+### 2.3 依赖约束
+
+- （待补充）
+
+---
+
+## 三. 接口测试规则（Interface Test Rule）
+
+### 3.1 目标与定位
+
+- **目标**：以 core 层为黑盒，通过其对外接口驱动测试，验证接口的逻辑正确性和功能完整性，追求高代码覆盖率。
+- **定位**：接口测试关注"接口本身的行为"，即通过接口调用真实执行 core 层内部业务逻辑，覆盖所有分支、边界和异常。
+- **mock 策略**：**只 mock 掉模块外部依赖**（如数据库、第三方 API、网络等），**不 mock core 层内部对象和方法**，保证核心业务逻辑真实执行。
+
+### 3.2 组织结构
+
+- **目录结构**  
+  ```
+  req_and_test/
+    <domain>/
+      interface/
+        test_<interface>.py   # 每个接口一个测试文件
+  ```
+- **测试文件**：每个接口（如 chat_service.py）对应一个测试文件，命名为 `test_<interface>.py`
+- **测试类**：每个接口方法对应一个测试类（测试套件），命名为 `Test<MethodName>`
+- **测试方法**：每个测试类下可有多个测试方法，覆盖该接口方法的不同输入、边界、异常、分支等。
+
+### 3.3 编写原则
+
+1. **锚定接口**：每个测试文件只测试一个接口（类/模块），每个测试类只测试一个接口方法。
+2. **mock 外部依赖**：对数据库、网络、第三方服务等模块外部依赖要 mock，保证测试运行快、无副作用。
+3. **不 mock core 层内部逻辑**：core 层内部对象和方法（如 ChatSession）要真实执行，确保业务逻辑被完整覆盖。
+4. **追求高覆盖**：覆盖所有分支、边界、异常、典型和非典型输入。
+5. **独立性**：每个测试方法应相互独立，互不影响。
+6. **命名规范**：见下方命名规则。
+
+### 3.4 命名规则
+
+- **测试文件**：`test_<interface>.py`
+- **测试类**：`Test<MethodName>`
+- **测试方法**：`test_<what>_should_<expected_behavior>`
+  - 例如：`test_valid_input_should_return_expected_result`
+  - 例如：`test_missing_required_field_should_raise_error`
+
+### 3.5 示例结构
+
+```python
+# req_and_test/mcp_chat/interface/test_chat_service.py
+
+import pytest
+from unittest.mock import patch
+from mcp_chat.core import chat_service
+
+class TestProcessMessage:
+    def test_valid_message_should_return_expected_result(self):
+        # 只 mock 外部依赖，core 层业务逻辑真实执行
+        with patch('mcp_chat.core.chat.create_llm_connector') as mock_llm:
+            mock_llm.return_value = None
+            result = chat_service.process_message("hello")
+            assert "content" in result
+```
+
+### 3.6 其他说明
+
+- 接口测试应与功能测试、验收测试分离，**只关注接口本身的行为和健壮性**。
+- 如接口有变更，需同步更新对应的接口测试文件。
+- 可结合 coverage 工具，定期检查接口测试的代码覆盖率。
+
+---
+
+## 四. 总结
+
+- **接口测试以 core 层为黑盒，驱动其对外接口，真实执行核心业务逻辑。**
+- **只 mock 外部依赖，不 mock core 层内部对象和方法。**
+- **每个接口一个文件，每个方法一个类，每个类多个测试方法。**
+- **命名清晰，结构统一，便于维护和扩展。**
+
+---
+
+如需后续补充接口设计部分或有具体问题，欢迎随时补充和完善本规则。

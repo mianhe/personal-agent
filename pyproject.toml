@@ -30,6 +30,9 @@ personal-agent = "cli.cli:main"
 testpaths = ["req_and_test"]
 python_files = ["test_*.py"]
 addopts = "-v --cov=src"
+filterwarnings = [
+    "ignore::DeprecationWarning:httpx.*:"
+]
 
 [tool.black]
 line-length = 88

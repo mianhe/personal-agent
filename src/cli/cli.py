@@ -1,40 +1,51 @@
 import os
-from typing import Dict, Callable
+from typing import Dict, Callable, Optional
+from prompt_toolkit import PromptSession
+from core.api.chat_service import ChatService
+from core.initialization import initialize_and_run_cli
 
 
 class CommandLineInterface:
     """Command Line Interface implementation for the personal agent."""
 
-    def __init__(self):
+    def __init__(self, chat_service: Optional[ChatService] = None):
         self.running = True
         self.cli_commands: Dict[str, Callable] = {
             "help": self._show_help,
             "exit": self._exit,
             "clear": self._clear_screen,
         }
+        self.chat_service = chat_service
+        self.session = PromptSession()
 
-    def start(self):
+    async def start(self):
         """启动CLI界面"""
         self._show_welcome()
+
         while self.running:
             try:
-                user_input = input("> ").strip()
+                user_input = (await self.session.prompt_async("> ")).strip()
                 if not user_input:
                     continue
-                self._process_input(user_input)
+                await self._process_input(user_input)
             except KeyboardInterrupt:
                 print("\nGoodbye!")
                 self.running = False
             except Exception as e:
                 print(f"Error: {str(e)}")
-                self.running = False
 
-    def _process_input(self, user_input: str) -> None:
+    async def _process_input(self, user_input: str) -> None:
         """处理用户输入"""
         if user_input.startswith("/"):
             self._handle_cli_command(user_input[1:])
         else:
-            print(f"You said: {user_input}")
+            try:
+                print("Thinking...", end="", flush=True)
+                response = await self.chat_service.send_message(user_input)
+                print("\b" * len("Thinking..."), end="", flush=True)  # 用退格键清除
+                print(f"Assistant: {response}")
+            except Exception as e:
+                print(f"Error: {e}")
 
     def _show_welcome(self):
         """显示欢迎信息"""
@@ -71,7 +82,7 @@ class CommandLineInterface:
 
 def main():
     """程序入口点"""
-    CommandLineInterface().start()
+    initialize_and_run_cli()
 
 
 if __name__ == "__main__":

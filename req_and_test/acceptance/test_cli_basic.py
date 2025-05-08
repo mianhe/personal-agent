@@ -1,27 +1,23 @@
 import sys
 from io import StringIO
-from unittest.mock import patch
+from unittest.mock import patch, AsyncMock
 
 import pytest
-
-from cli.cli import CommandLineInterface
-
-
-@pytest.fixture
-def cli():
-    """提供CLI实例"""
-    return CommandLineInterface()
 
 
 class TestCLIStartup:
     """CLI启动测试"""
 
-    def test_should_display_welcome_message_on_startup(self, cli):
+    @pytest.mark.asyncio
+    async def test_should_display_welcome_message_on_startup(self, cli):
         """测试启动时显示欢迎信息"""
-        with patch("builtins.input", return_value="/exit"):
+        with patch(
+            "prompt_toolkit.PromptSession.prompt_async", new_callable=AsyncMock
+        ) as mock_prompt:
+            mock_prompt.return_value = "/exit"
             with StringIO() as stdout:
                 sys.stdout = stdout
-                cli.start()
+                await cli.start()
                 output = stdout.getvalue()
                 assert "Welcome to Personal Agent CLI!" in output
                 assert "Type /help for available commands" in output
@@ -30,6 +26,7 @@ class TestCLIStartup:
 class TestCLICommandParsing:
     """CLI命令解析测试"""
 
+    @pytest.mark.asyncio
     @pytest.mark.parametrize(
         "command,expected_outputs",
         [
@@ -41,12 +38,15 @@ class TestCLICommandParsing:
             ("", []),  # 空输入应该被忽略
         ],
     )
-    def test_command_handling(self, cli, command, expected_outputs):
+    async def test_command_handling(self, cli, command, expected_outputs):
         """测试命令处理"""
-        with patch("builtins.input", side_effect=[command, "/exit"]):
+        with patch(
+            "prompt_toolkit.PromptSession.prompt_async", new_callable=AsyncMock
+        ) as mock_prompt:
+            mock_prompt.side_effect = [command, "/exit"]
             with StringIO() as stdout:
                 sys.stdout = stdout
-                cli.start()
+                await cli.start()
                 output = stdout.getvalue()
                 for expected in expected_outputs:
                     assert expected in output

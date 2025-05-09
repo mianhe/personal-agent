@@ -20,7 +20,7 @@ fi
 
 # 运行测试
 echo "\n🧪 Running tests..."
-python -m pytest req_and_test/acceptance/test_cli_basic.py -v
+python -m pytest -m smoke -v
 if [ $? -ne 0 ]; then
     echo "❌ tests failed"
     exit 1

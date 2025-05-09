@@ -4,6 +4,9 @@ from unittest.mock import patch, AsyncMock
 
 import pytest
 
+# 忽略特定的协程警告
+pytestmark = [pytest.mark.filterwarnings("ignore::RuntimeWarning:asyncio.base_events")]
+
 
 @pytest.mark.asyncio
 async def test_show_processing_indicator(cli):
@@ -19,6 +22,7 @@ async def test_show_processing_indicator(cli):
             assert "Thinking..." in output
 
 
+@pytest.mark.smoke
 @pytest.mark.asyncio
 async def test_maintain_conversation_context(cli):
     """测试维护对话上下文"""
@@ -26,15 +30,15 @@ async def test_maintain_conversation_context(cli):
         "prompt_toolkit.PromptSession.prompt_async", new_callable=AsyncMock
     ) as mock_prompt:
         mock_prompt.side_effect = [
-            "What is 1+1?",
-            "What was my previous question?",
+            "my name is Alice",
+            "What was my name?",
             "/exit",
         ]
         with StringIO() as stdout:
             sys.stdout = stdout
             await cli.start()
             output = stdout.getvalue()
-            assert "1+1" in output
+            assert "Alice" in output
 
 
 @pytest.mark.asyncio
@@ -44,7 +48,7 @@ async def test_handle_network_error(cli):
         "prompt_toolkit.PromptSession.prompt_async", new_callable=AsyncMock
     ) as mock_prompt:
         mock_prompt.side_effect = ["Hello", "/exit"]
-        with patch("litellm.completion", side_effect=ConnectionError("Network error")):
+        with patch("litellm.acompletion", side_effect=ConnectionError("Network error")):
             with StringIO() as stdout:
                 sys.stdout = stdout
                 await cli.start()

@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
 import pytest
 from core.llm.chat_service_impl import ChatServiceImpl
 from core.llm.config import Config, LLMConfig, AppConfig
@@ -7,17 +7,10 @@ from core.llm.config import Config, LLMConfig, AppConfig
 @pytest.fixture(scope="function")
 def mock_litellm():
     """模拟 litellm 服务"""
-    with patch("litellm.completion") as mock:
-
-        def completion_side_effect(*_, **__):  # 使用 _ 表示未使用的参数
-            # 创建一个模拟的响应对象
-            response = MagicMock()
-            response.choices = [MagicMock()]
-            response.choices[0].message.content = "这是一个测试回复"
-            return response
-
-        # 设置 side effect 函数
-        mock.side_effect = completion_side_effect
+    with patch("litellm.acompletion", new_callable=AsyncMock) as mock:
+        mock.return_value = MagicMock(
+            choices=[MagicMock(message=MagicMock(content="这是一个测试回复"))]
+        )
         yield mock
 
 

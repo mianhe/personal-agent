@@ -24,6 +24,7 @@ class LLMConfig(BaseModel):
     provider: str
     model: str
     api_key: str
+    api_base: Optional[str] = None  # API 基础 URL，如果为 None 则使用默认值
     parameters: LLMParameters = Field(default_factory=LLMParameters)
     connection: ConnectionConfig = Field(default_factory=ConnectionConfig)
 

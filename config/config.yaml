@@ -1,7 +1,8 @@
 llm:
   provider: deepseek
-  model: deepseek/deepseek-chat
+  model: deepseek-chat
   api_key: sk-eaa74bbdf39d487987e781803bced195
+  api_base: https://api.deepseek.com/v1  # 可选的 API 基础 URL
   parameters:
     temperature: 0.7
     max_tokens: 1000

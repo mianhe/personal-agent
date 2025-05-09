@@ -4,6 +4,8 @@ from unittest.mock import patch, AsyncMock
 
 import pytest
 
+pytestmark = pytest.mark.smoke
+
 
 class TestCLIStartup:
     """CLI启动测试"""

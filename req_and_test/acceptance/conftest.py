@@ -6,11 +6,6 @@ from core.cli_initialization import create_chat_service
 from cli.cli import CommandLineInterface
 
 
-def pytest_configure(config):
-    """注册自定义标记"""
-    config.addinivalue_line("markers", "implemented: 标记已实现的测试用例")
-
-
 @pytest.fixture
 def cli():
     """提供CLI实例"""

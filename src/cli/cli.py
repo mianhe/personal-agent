@@ -2,7 +2,6 @@ import os
 from typing import Dict, Callable, Optional
 from prompt_toolkit import PromptSession
 from core.api.chat_service import ChatService
-from core.initialization import initialize_and_run_cli
 
 
 class CommandLineInterface:
@@ -78,12 +77,3 @@ class CommandLineInterface:
         """清屏"""
         os.system("cls" if os.name == "nt" else "clear")
         self._show_welcome()
-
-
-def main():
-    """程序入口点"""
-    initialize_and_run_cli()
-
-
-if __name__ == "__main__":
-    main()

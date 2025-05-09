@@ -24,7 +24,7 @@ classifiers = [
 ]
 
 [project.scripts]
-personal-agent = "cli.cli:main"
+personal-agent = "cli.cli_entry:main"
 
 [tool.pytest.ini_options]
 testpaths = ["req_and_test"]

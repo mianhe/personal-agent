@@ -1,0 +1,22 @@
+repos:
+-   repo: https://github.com/psf/black
+    rev: 24.2.0
+    hooks:
+    -   id: black
+        language_version: python3
+        args: [--check, src/, req_and_test/]
+
+-   repo: local
+    hooks:
+    -   id: pylint
+        name: pylint
+        entry: bash -c 'cd ${PWD} && pylint src/ req_and_test/'
+        language: system
+        types: [python]
+        pass_filenames: false
+
+    -   id: pytest
+        name: pytest
+        entry: python -m pytest -m smoke -v
+        language: system
+        pass_filenames: false 

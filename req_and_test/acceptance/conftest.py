@@ -2,7 +2,7 @@
 
 import pytest
 
-from core.cli_initialization import create_chat_service
+from core.chat_svc_init import create_chat_service
 from cli.cli import CommandLineInterface
 
 

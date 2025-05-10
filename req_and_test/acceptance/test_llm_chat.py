@@ -48,7 +48,10 @@ async def test_handle_network_error(cli):
         "prompt_toolkit.PromptSession.prompt_async", new_callable=AsyncMock
     ) as mock_prompt:
         mock_prompt.side_effect = ["Hello", "/exit"]
-        with patch("litellm.acompletion", side_effect=ConnectionError("Network error")):
+        with patch(
+            "langchain_openai.ChatOpenAI.ainvoke",
+            side_effect=ConnectionError("Network error"),
+        ):
             with StringIO() as stdout:
                 sys.stdout = stdout
                 await cli.start()

@@ -63,7 +63,7 @@ class Config(BaseModel):
         """
         if config_path is None:
             # 获取当前文件所在目录
-            current_dir = Path(__file__).parent.parent.parent.parent
+            current_dir = Path(__file__).parent.parent.parent
             config_path = current_dir / "config" / "config.yaml"
 
         if not config_path.exists():

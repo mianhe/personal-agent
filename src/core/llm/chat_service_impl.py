@@ -3,7 +3,7 @@ import litellm
 from litellm import completion
 
 from ..api.chat_service import ChatService
-from .config import Config, LLMConfig
+from src.config.config import Config, LLMConfig
 
 
 class ChatServiceImpl(ChatService):

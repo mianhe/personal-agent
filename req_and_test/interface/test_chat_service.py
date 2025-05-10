@@ -1,7 +1,7 @@
 from unittest.mock import patch, MagicMock, AsyncMock
 import pytest
 from core.llm.chat_service_impl import ChatServiceImpl
-from core.llm.config import Config, LLMConfig, AppConfig
+from src.config.config import Config, LLMConfig, AppConfig
 
 
 @pytest.fixture(scope="function")

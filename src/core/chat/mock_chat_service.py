@@ -1,5 +1,5 @@
 from typing import List, Dict
-from .chat_service import ChatService
+from .chat_service_api import ChatService
 
 
 class MockChatService(ChatService):

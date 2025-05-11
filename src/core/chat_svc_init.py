@@ -1,7 +1,7 @@
 """CLI 初始化模块。"""
 
 import asyncio
-from core.llm.chat_service_impl import ChatServiceImpl
+from core.chat.chat_service_impl import ChatServiceImpl
 
 
 def create_chat_service():

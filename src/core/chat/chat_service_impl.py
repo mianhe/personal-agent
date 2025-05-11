@@ -1,6 +1,6 @@
 from typing import List, Dict, Optional
-from ..api.chat_service import ChatService
-from src.config.config import Config, LLMConfig
+from core.chat.chat_service_api import ChatService
+from config.config import Config, LLMConfig
 
 # langchain 0.3.x 推荐用法
 from langchain_core.messages import HumanMessage, AIMessage

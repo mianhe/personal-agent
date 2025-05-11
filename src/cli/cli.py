@@ -1,7 +1,7 @@
 import os
 from typing import Dict, Callable, Optional
 from prompt_toolkit import PromptSession
-from core.api.chat_service import ChatService
+from core.chat.chat_service_api import ChatService
 
 
 class CommandLineInterface:

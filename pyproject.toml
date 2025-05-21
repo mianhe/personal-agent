@@ -24,10 +24,10 @@ classifiers = [
 ]
 
 [project.scripts]
-personal-agent = "cli.cli_entry:main"
+personal-agent = "personal_agent.main:main"
 
 [tool.pytest.ini_options]
-testpaths = ["req_and_test"]
+testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-v --cov=src"
 filterwarnings = [

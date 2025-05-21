@@ -2,18 +2,19 @@ llm:
   provider: deepseek
   model: deepseek-chat
   api_key: sk-eaa74bbdf39d487987e781803bced195
-  api_base: https://api.deepseek.com/v1  # 可选的 API 基础 URL
-  parameters:
-    temperature: 0.7
-    max_tokens: 1000
-  connection:
-    timeout: 30
-    retry_attempts: 3
+  api_base: https://api.deepseek.com/v1  # 可选的 API 基础 URL  
+  temperature: 0.7
+  max_tokens: 1000
+  timeout: 30
+  retry_attempts: 3
 
 app:
   name: personal-agent
   version: 0.1.0
   environment: development
-  cli:
-    prompt: "> "
-    welcome_message: "Welcome to Personal Agent CLI!" 
+
+cli:
+  prompt: "> "
+  welcome_message: "Welcome to Personal Agent CLI ... " 
+
+

@@ -1,3 +1,5 @@
+# pylint: disable=duplicate-code
+
 import os
 from typing import Dict, Callable, Optional
 from prompt_toolkit import PromptSession

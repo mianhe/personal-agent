@@ -3,7 +3,7 @@
 from unittest.mock import AsyncMock
 import pytest
 from dependency_injector import providers
-from personal_agent.container import AppContainer  # 使用顶层容器
+from personal_agent.app.container import AppContainer  # 使用顶层容器
 
 pytestmark = pytest.mark.smoke
 

@@ -4,7 +4,7 @@
 
 import pytest
 
-from personal_agent.container import AppContainer
+from personal_agent.app.container import AppContainer
 
 
 @pytest.fixture

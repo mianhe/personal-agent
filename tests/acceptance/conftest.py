@@ -10,5 +10,5 @@ from personal_agent.app.container import AppContainer
 @pytest.fixture
 def cli():
     """提供CLI实例"""
-    cli = AppContainer().cli_container.cli()
+    cli = AppContainer().cli()
     return cli

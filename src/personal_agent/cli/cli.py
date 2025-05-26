@@ -4,12 +4,17 @@ import os
 from typing import Dict, Callable, Optional
 from prompt_toolkit import PromptSession
 from personal_agent.chat import ChatService
+from personal_agent.mcp.api.server_registry_api import ServerRegistry
 
 
 class CommandLineInterface:
     """Command Line Interface implementation for the personal agent."""
 
-    def __init__(self, chat_service: Optional[ChatService] = None):
+    def __init__(
+        self,
+        server_registry: ServerRegistry,
+        chat_service: Optional[ChatService] = None,
+    ):
         self.running = True
         self.cli_commands: Dict[str, Callable] = {
             "help": self._show_help,
@@ -17,7 +22,9 @@ class CommandLineInterface:
             "clear": self._clear_screen,
             "server": self._server_command,  # 预留server命令
         }
-        self.chat_service = chat_service()
+        self.server_registry = server_registry()
+
+        self.chat_service = chat_service() if chat_service else None
         self.session = PromptSession()
         # self.server_registry = ServerRegistry()  # 具体实现后添加
 
@@ -121,35 +128,74 @@ class CommandLineInterface:
 
     def _server_add(self, *args):
         """
-        /server add <name> <url> [description]
-        添加服务器。仅定义接口。
+        /server add <name> <url>
+        添加服务器。
         """
-        pass
+        if len(args) < 2:
+            print("Usage: /server add <name> <url>")
+            return
+        name, url = args[0], args[1]
+        success = self.server_registry.add_server(name, url)
+        if success:
+            print(f"服务器 {name} 添加成功")
+        else:
+            print("名称重复，添加失败")
 
     def _server_list(self):
         """
         /server list
-        列出所有服务器。仅定义接口。
+        列出所有服务器。
         """
-        pass
+        servers = self.server_registry.list_servers()
+        if not servers:
+            print("没有服务器可用")
+        else:
+            print("服务器列表：")
+            for s in servers:
+                print(f"- {s['name']}: {s['url']}")
 
     def _server_remove(self, *args):
         """
         /server remove <name>
-        删除服务器。仅定义接口。
+        删除服务器。
         """
-        pass
+        if len(args) < 1:
+            print("Usage: /server remove <name>")
+            return
+        name = args[0]
+        success = self.server_registry.remove_server(name)
+        if success:
+            print(f"服务器 {name} 已删除")
+        else:
+            print("没有这样的服务器")
 
     def _server_info(self, *args):
         """
         /server info <name>
-        查看服务器详情。仅定义接口。
+        查看服务器详情。
         """
-        pass
+        if len(args) < 1:
+            print("Usage: /server info <name>")
+            return
+        name = args[0]
+        info = self.server_registry.get_server(name)
+        if info:
+            print(f"服务器名称: {info['name']}")
+            print(f"服务器地址: {info['url']}")
+        else:
+            print("没有这样的服务器")
 
     def _server_edit(self, *args):
         """
-        /server edit <name> <url> [description]
-        编辑服务器。仅定义接口。
+        /server edit <name> <url>
+        编辑服务器。
         """
-        pass
+        if len(args) < 2:
+            print("Usage: /server edit <name> <url>")
+            return
+        name, url = args[0], args[1]
+        success = self.server_registry.edit_server(name, url)
+        if success:
+            print(f"服务器 {name} 地址已更新")
+        else:
+            print("没有这样的服务器")

@@ -1,20 +1,26 @@
-# 接口定义规范
-
+---
+description: 设计和定义子系统接口时需要遵循的规则和方法
+globs: 
+alwaysApply: false
+---
 为确保系统的可维护性、可扩展性和解耦性，所有子系统的接口定义必须遵循如下规范：
 
 1. **接口文件的组织**
-   - 接口文件必须放在子系统的 `api` 子目录下。
-   - 默认情况下，一个子系统只需一个接口文件。接口文件命名应体现其主要职责，并以 `_api` 结尾，如：`user_management_api.py`。
+   - 接口文件必须放在子系统的 `api` 子目录下，如 src/personal_agent/mcp/api/server_registry_api.py
+   - 接口文件命名应体现其主要职责，并以 `_api` 结尾
+   - 一般情况下一个子系统只有一个接口文件，除非有明确不同职责时，可以创建多个接口文件，分别代表不同职责的接口
+   - 在接口文件中，一组紧密相关的接口方应组成一个接口类。
 
 2. **接口类的设计**
-   - 一组紧密相关的接口方应组成一个接口类。
    - 接口类必须为纯抽象类（继承 `ABC`，所有方法用 `@abstractmethod` 标记），且每个接口类必须有 docstring 说明其职责。
-   - 接口文件不得包含任何实现代码，仅可定义接口类及与接口直接相关的数据结构（如 dataclass、TypedDict、pydantic.BaseModel 等），用于描述接口的输入、输出或领域对象。如有多个接口类，需确保各自职责边界清晰，避免重复。
+   - 接口文件不包含任何实现代码，仅可定义接口类及与接口直接相关的数据结构（如 dataclass、TypedDict、pydantic.BaseModel 等），用于描述接口的输入、输出或领域对象。如有多个接口类，需确保各自职责边界清晰，避免重复。
    - 所有接口类、方法及相关数据结构必须完整标注类型注解，明确参数和返回值类型，确保类型契约清晰、可静态检查。
+   - **契约式设计要求**：接口方法应通过类型注解、docstring 和（如有需要）契约工具（如 icontract）明确表达前置条件、后置条件和不变式。前置条件约束调用方输入，后置条件约束方法输出和可观察副作用。不变式用于描述接口类在方法调用前后的稳定状态。契约应简明、无副作用，避免与类型注解和文档重复。
    - 典型接口文件示例：
      ```python
      from abc import ABC, abstractmethod
      from dataclasses import dataclass
+     from icontract import require, ensure
 
      @dataclass
      class UserInfo:
@@ -27,6 +33,7 @@
          用户管理接口，负责用户的创建、查询、更新、删除等基础用户管理操作。
          """
          @abstractmethod
+         @require(lambda user_info: user_info.user_id != "", "用户ID不能为空")
          def create_user(self, user_info: UserInfo):
              """创建用户"""
              pass
@@ -51,6 +58,7 @@
          用户认证接口，负责用户的身份认证、密码重置等安全相关操作。
          """
          @abstractmethod
+         @require(lambda username: username != "", "用户名不能为空")
          def authenticate(self, username: str, password: str) -> bool:
              """用户身份认证"""
              pass
@@ -70,6 +78,3 @@
      __all__ = ["ChatService", "Container"]
      ```
 
-4. **职责边界与唯一性**
-   - 每个接口类应职责单一，避免接口方法职责重叠。
-   - 如需扩展接口，应新建接口类并明确其边界，避免接口膨胀。

@@ -178,9 +178,6 @@ class TestConfigureServer:
         """
         验收标准：用户通过 /server info <name> 能正确显示服务器的详细信息
         """
-        # 清理服务器状态（假设cli有reset或类似方法，否则可重建cli实例）
-        # if hasattr(cli.server_registry, "_servers"):
-        #     cli.server_registry._servers.clear()
         output = await run_cli_with_inputs(
             cli,
             capsys,
@@ -192,8 +189,6 @@ class TestConfigureServer:
         )
         assert "test" in output
         assert "http://localhost:8000" in output
-        # if hasattr(cli.server_registry, "_servers"):
-        #     cli.server_registry._servers.clear()
 
 
 # 功能点2：用户指定 MCP 服务器回答问题

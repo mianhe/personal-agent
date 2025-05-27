@@ -1,0 +1,8 @@
+---
+description: 按接口定义实现接口时的方法和规则
+globs: 
+alwaysApply: false
+---
+1. 首先要明确需要实现的接口是什么，接口定义在子系统的 API目录下
+   - 
+2. 

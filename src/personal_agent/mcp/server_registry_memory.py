@@ -1,5 +1,5 @@
 from typing import List, Dict, Optional
-from .api.server_registry_api import ServerRegistry
+from .api.server_registry import ServerRegistry
 
 
 class MemoryServerRegistry(ServerRegistry):

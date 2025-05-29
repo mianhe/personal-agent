@@ -15,53 +15,48 @@ alwaysApply: false
    - 接口类必须为纯抽象类（继承 `ABC`，所有方法用 `@abstractmethod` 标记），且每个接口类必须有 docstring 说明其职责。
    - 接口文件不包含任何实现代码，仅可定义接口类及与接口直接相关的数据结构（如 dataclass、TypedDict、pydantic.BaseModel 等），用于描述接口的输入、输出或领域对象。如有多个接口类，需确保各自职责边界清晰，避免重复。
    - 所有接口类、方法及相关数据结构必须完整标注类型注解，明确参数和返回值类型，确保类型契约清晰、可静态检查。
-   - **契约式设计要求**：接口方法应通过类型注解、docstring 和（如有需要）契约工具（如 icontract）明确表达前置条件、后置条件和不变式。前置条件约束调用方输入，后置条件约束方法输出和可观察副作用。不变式用于描述接口类在方法调用前后的稳定状态。契约应简明、无副作用，避免与类型注解和文档重复。
+   - 接口定义符合契约式设计的原则，也就是“有限承诺，使命必答”。严格接口调用的前置条件，在遵守契约的前提下确保服务承诺，并保证后置条件的满足。
+   - 应通过类型注解、docstring 和 icontract契约工具，明确表达前置条件、后置条件和不变式。前置条件约束调用方输入，后置条件约束方法输出和可观察副作用。不变式用于描述接口类在方法调用前后的稳定状态。契约应简明、无副作用，避免与类型注解和文档重复。
    - 典型接口文件示例：
      ```python
-     from abc import ABC, abstractmethod
-     from dataclasses import dataclass
-     from icontract import require, ensure
+        from urllib.parse import urlparse
+        from abc import ABC, abstractmethod
+        from typing import List, Optional, Dict
+        from icontract import require, ensure
 
-     @dataclass
-     class UserInfo:
-         user_id: str
-         name: str
-         email: str
 
-     class UserManager(ABC):
-         """
-         用户管理接口，负责用户的创建、查询、更新、删除等基础用户管理操作。
-         """
-         @abstractmethod
-         @require(lambda user_info: user_info.user_id != "", "用户ID不能为空")
-         def create_user(self, user_info: UserInfo):
-             """创建用户"""
-             pass
+        def is_valid_url(url: str) -> bool:
+            if not isinstance(url, str) or not url:
+                return False
+            try:
+                result = urlparse(url)
+                return all([result.scheme, result.netloc])
+            except Exception:
+                return False
 
-         @abstractmethod
-         def get_user(self, user_id: str) -> UserInfo:
-             """获取用户信息"""
-             pass
 
-         @abstractmethod
-         def update_user(self, user_id: str, user_info: UserInfo):
-             """更新用户信息"""
-             pass
+        class ServerRegistry(ABC):
+            """
+            MCP服务器注册与管理接口，负责服务器的增删查改。
+            """
 
-         @abstractmethod
-         def delete_user(self, user_id: str):
-             """删除用户"""
-             pass
+            @abstractmethod
+            @ensure(lambda result: isinstance(result, list))
+            def list_servers(self) -> List[Dict[str, str]]:
+                """
+                获取所有已注册的服务器信息。
+                """
 
-     class UserAuthenticator(ABC):
-         """
-         用户认证接口，负责用户的身份认证、密码重置等安全相关操作。
-         """
-         @abstractmethod
-         @require(lambda username: username != "", "用户名不能为空")
-         def authenticate(self, username: str, password: str) -> bool:
-             """用户身份认证"""
-             pass
+            @abstractmethod
+            @require(
+                lambda name: isinstance(name, str) and name != "", "服务器名称必须为非空字符串"
+            )
+            @require(is_valid_url, "服务器地址必须为合法的 URL")
+            @ensure(lambda result: isinstance(result, bool))
+            def add_server(self, name: str, url: str) -> bool:
+                """
+                添加新服务器。若名称重复则添加失败。
+                """
      ```
 
 3. **接口的对外暴露**

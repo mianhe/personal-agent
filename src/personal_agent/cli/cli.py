@@ -4,10 +4,11 @@ import os
 from typing import Dict, Callable, Optional
 from prompt_toolkit import PromptSession
 from personal_agent.chat import ChatService
-from personal_agent.mcp.api.server_registry_api import ServerRegistry
+from personal_agent.mcp.api.server_registry import ServerRegistry
+from .api.cli_service import CommandLineInterface as CLIServiceInterface
 
 
-class CommandLineInterface:
+class CommandLineInterface(CLIServiceInterface):
     """Command Line Interface implementation for the personal agent."""
 
     def __init__(
@@ -20,13 +21,12 @@ class CommandLineInterface:
             "help": self._show_help,
             "exit": self._exit,
             "clear": self._clear_screen,
-            "server": self._server_command,  # 预留server命令
+            "server": self._server_command,
         }
         self.server_registry = server_registry()
 
         self.chat_service = chat_service() if chat_service else None
         self.session = PromptSession()
-        # self.server_registry = ServerRegistry()  # 具体实现后添加
 
     async def start(self):
         """启动CLI界面"""

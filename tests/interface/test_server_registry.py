@@ -1,16 +1,16 @@
-from personal_agent.mcp.container import MCPContainer
-from personal_agent.mcp.api.server_registry_api import ServerRegistry
+import pytest
+from personal_agent.mcp import Container as MCPContainer
+from personal_agent.mcp import ServerRegistry
 
 
 class TestServerRegistry:
-    def __init__(self):
-        container = MCPContainer()
-        self.registry: ServerRegistry = container.server_registry()
 
-    # @pytest.fixture(autouse=True)
-    # def setup_registry(self):
-    #     # 保持兼容性，如果有需要可以在这里重置 registry
-    #     pass
+    registry: ServerRegistry
+
+    @pytest.fixture(autouse=True)
+    def setup_registry(self):
+        container = MCPContainer()
+        self.registry = container.server_registry()
 
     def test_add_server_should_succeed(self):
         result = self.registry.add_server("server1", "http://localhost:8000")

@@ -1,5 +1,5 @@
 from typing import List, Dict
-from .api.chat_service_api import ChatService
+from .api.chat_service import ChatService
 from .llm_adapter import LLMAdapter
 
 

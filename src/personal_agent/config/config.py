@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional
 import yaml
 from pydantic import BaseModel, Field
-from .api.config_api import ConfigSupplier
+from .api.config_supplier import ConfigSupplier
 
 
 class FileConfigSupplier(ConfigSupplier):

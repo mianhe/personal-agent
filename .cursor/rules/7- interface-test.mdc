@@ -1,0 +1,55 @@
+---
+description: 设计接口测试时的规则，包括命名、用例设计和依赖隔离等
+globs: 
+alwaysApply: false
+---
+接口测试针对的是单个子系统对外提供的服务，确保覆盖其对外的契约和服务。
+
+1. 目录与文件组织
+- 所有接口测试文件统一放在 `tests/interface/` 目录下，结构与接口定义目录保持一致。
+- 每个接口文件对应一个测试文件，命名为：  test_<模块名>_<接口名>.py，比如 mcp/api/server_registry.py 对应的测试是：test_mcp_server_registry.py
+
+1. 测试类与用例命名
+- 每个接口类对应一个测试类，命名为：`Test<InterfaceClass>`  ，例如：`TestUserManager`
+- 每个接口方法对应一组测试用例，命名为：   `test_<method>_<scenario>_should_<expected_behavior>`  ，例如：`test_create_user_with_invalid_email_should_raise_error`
+
+1. 测试用例的内容与覆盖
+- 每个接口方法必须有覆盖契约、正常流程、边界条件和异常场景的测试用例。
+- 测试用例应覆盖接口定义中的所有类型契约，包括参数类型、返回值类型和数据结构约束。
+
+1. 依赖的隔离和依赖注入
+- 接口测试中子系统的对外依赖能够通过 mock/stub等隔离的尽量隔离，除了公共的基础服务
+- 子系统通过container进行创建和注入依赖，禁止在测试中直接实例化接口实现类或手动拼装依赖
+- 测试中对子系统的操作只能通过接口进行，禁止调用子系统的内部实现
+
+```python
+import pytest
+from unittest.mock import AsyncMock
+from personal_agent.chat import Container as ChatContainer
+from personal_agent.chat import ChatService
+
+class TestChatServiceApi:
+    mock_llm_adapter: AsyncMock
+    service: ChatService
+
+    @pytest.fixture(autouse=True)
+    def setup_service(self):
+        # mock llm_adapter
+        self.mock_llm_adapter = AsyncMock()
+        async def mock_chat(message, *args, **kwargs):
+            return f"mocked response to {message}"
+        self.mock_llm_adapter.chat.side_effect = mock_chat
+        
+        container = ChatContainer(configer=lambda: None, llm_adapter=self.mock_llm_adapter)
+        self.service = container.chat_service()
+
+    @pytest.mark.asyncio
+    async def test_get_response_should_return_mocked(self):
+        reply = await self.service.get_response("hello")
+        assert reply == "mocked response to [{'role': 'user', 'content': 'hello'}]"
+        self.mock_llm_adapter.chat.assert_called_once()
+```
+
+
+
+

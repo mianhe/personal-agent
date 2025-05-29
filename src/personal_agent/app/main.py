@@ -1,10 +1,11 @@
 import asyncio
-from personal_agent.app.container import AppContainer
+from personal_agent.app import Container
+from personal_agent.cli import CommandLineInterface
 
 
 def main():
-    container = AppContainer()
-    cli = container.cli_container().cli()
+    container = Container()
+    cli: CommandLineInterface = container.cli_container().cli()
     asyncio.run(cli.start())
 
 

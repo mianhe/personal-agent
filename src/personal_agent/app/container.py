@@ -8,7 +8,7 @@ from dependency_injector import containers, providers
 from personal_agent.config import ConfigContainer
 from personal_agent.chat import Container as ChatContainer
 from personal_agent.cli import Container as CliContainer
-from personal_agent.mcp.container import MCPContainer
+from personal_agent.mcp import Container as MCPContainer
 
 
 class AppContainer(containers.DeclarativeContainer):
